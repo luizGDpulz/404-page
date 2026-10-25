@@ -29,13 +29,34 @@ import '../styles/global.css';
         404
       </h1>
 
+      <h2 class="mt-5 text-xl sm:text-2xl font-semibold tracking-tight text-zinc-100">
+        Parece que você se perdeu!
+      </h2>
+
+      <div class="mt-4 flex flex-col items-center">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-zinc-900/90 border border-zinc-800 font-mono text-xs sm:text-sm max-w-full shadow-sm">
+          <span class="text-zinc-500 select-none font-semibold">GET</span>
+          <code id="domain-badge" class="accent-text font-medium break-all">...</code>
+        </div>
+
+        <div id="typo-wrapper" hidden class="mt-2.5">
+          <a
+            id="typo-link"
+            href="#"
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800/80 accent-border-hover text-xs text-zinc-400 hover:text-zinc-200 transition-all"
+          >
+            <span>💡 Quis dizer</span>
+            <span id="typo-target" class="font-mono accent-text font-medium underline underline-offset-2"></span>
+            <span>?</span>
+          </a>
+        </div>
+      </div>
+
       <p
         id="error-message"
-        class="mt-6 text-base sm:text-lg text-zinc-400 leading-relaxed max-w-md mx-auto"
+        class="mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed max-w-md mx-auto"
       >
-        Parece que você se perdeu, o endereço que você buscou
-        <code id="domain-badge" class="px-2 py-0.5 mx-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-emerald-400 font-mono text-sm break-all">...</code>
-        não existe ou eu quebrei alguma coisa!
+        O endereço que você buscou não existe ou eu quebrei alguma coisa!
       </p>
 
       <nav
@@ -154,7 +175,10 @@ import '../styles/global.css';
     <script>
       import type { AppConfig } from '../types/config';
 
-      const DEFAULT_TEMPLATE =
+      const DEFAULT_SUBTITLE =
+        'O endereço que você buscou não existe ou eu quebrei alguma coisa!';
+
+      const LEGACY_DEFAULT_TEMPLATE =
         'Parece que você se perdeu, o endereço que você buscou {domain} não existe ou eu quebrei alguma coisa!';
 
       const THEMES = [
@@ -190,34 +214,91 @@ import '../styles/global.css';
       }
 
       function renderMessage(template: string, domain: string): void {
+        const badgeEl = document.getElementById('domain-badge');
+        if (badgeEl) {
+          badgeEl.textContent = domain;
+        }
+
         const msgEl = document.getElementById('error-message');
         if (!msgEl) return;
 
-        const effectiveTemplate = template.trim() || DEFAULT_TEMPLATE;
-        if (!effectiveTemplate.includes('{domain}')) {
-          msgEl.textContent = effectiveTemplate;
+        const trimmed = template.trim();
+        if (!trimmed || trimmed === LEGACY_DEFAULT_TEMPLATE) {
+          msgEl.textContent = DEFAULT_SUBTITLE;
           return;
         }
 
-        const [before, ...rest] = effectiveTemplate.split('{domain}');
-        const after = rest.join('{domain}');
+        msgEl.textContent = trimmed.replace('{domain}', domain);
+      }
 
-        msgEl.textContent = '';
-        msgEl.appendChild(document.createTextNode(before));
+      function levenshtein(a: string, b: string): number {
+        const dp = Array.from({ length: a.length + 1 }, (_, i) =>
+          Array.from({ length: b.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+        );
+        for (let i = 1; i <= a.length; i++) {
+          for (let j = 1; j <= b.length; j++) {
+            dp[i][j] =
+              a[i - 1] === b[j - 1]
+                ? dp[i - 1][j - 1]
+                : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+          }
+        }
+        return dp[a.length][b.length];
+      }
 
-        const code = document.createElement('code');
-        code.id = 'domain-badge';
-        code.className =
-          'px-2 py-0.5 mx-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-emerald-400 font-mono text-sm break-all';
-        code.textContent = domain;
-        msgEl.appendChild(code);
+      function checkTypoSuggestion(portfolioUrl: string, githubUrl: string): void {
+        const wrapper = document.getElementById('typo-wrapper');
+        const linkEl = document.getElementById('typo-link') as HTMLAnchorElement | null;
+        const targetEl = document.getElementById('typo-target');
+        if (!wrapper || !linkEl || !targetEl) return;
 
-        msgEl.appendChild(document.createTextNode(after));
+        const sub = window.location.hostname.split('.')[0]?.toLowerCase() || '';
+        const pathSeg = window.location.pathname.split('/').filter(Boolean)[0]?.toLowerCase() || '';
+        const query = sub && sub !== 'localhost' && sub !== 'www' ? sub : pathSeg;
+
+        if (!query || query.length < 3) {
+          wrapper.hidden = true;
+          return;
+        }
+
+        const candidates: Array<{ keyword: string; label: string; url: string }> = [];
+
+        if (portfolioUrl) {
+          try {
+            const parsed = new URL(portfolioUrl);
+            const kw = parsed.hostname.split('.')[0].toLowerCase();
+            candidates.push({ keyword: kw, label: parsed.hostname, url: portfolioUrl });
+          } catch {
+            // URL inválida ignorada
+          }
+        }
+
+        if (githubUrl) {
+          candidates.push({ keyword: 'github', label: 'GitHub', url: githubUrl });
+          candidates.push({ keyword: 'git', label: 'GitHub', url: githubUrl });
+        }
+
+        for (const item of candidates) {
+          const dist = levenshtein(query, item.keyword);
+          const isClose =
+            dist <= 3 ||
+            (query.length >= 3 && item.keyword.includes(query)) ||
+            (item.keyword.length >= 3 && query.includes(item.keyword));
+
+          if (isClose) {
+            linkEl.href = item.url;
+            targetEl.textContent = item.label;
+            wrapper.hidden = false;
+            return;
+          }
+        }
+
+        wrapper.hidden = true;
       }
 
       function applyConfig(config: AppConfig): void {
         const domain = getCurrentDomain();
-        renderMessage(config.messageTemplate || DEFAULT_TEMPLATE, domain);
+        renderMessage(config.messageTemplate || DEFAULT_SUBTITLE, domain);
 
         const linksSection = document.getElementById('links-section');
         const portfolioBtn = document.getElementById('portfolio-btn') as HTMLAnchorElement | null;
@@ -227,6 +308,8 @@ import '../styles/global.css';
 
         const portfolioUrl = config.portfolioUrl?.trim() || '';
         const githubUrl = config.githubUrl?.trim() || '';
+
+        checkTypoSuggestion(portfolioUrl, githubUrl);
 
         let hasAnyLink = false;
 
@@ -321,7 +404,7 @@ import '../styles/global.css';
 
       async function init(): Promise<void> {
         randomizeTheme();
-        renderMessage(DEFAULT_TEMPLATE, getCurrentDomain());
+        renderMessage(DEFAULT_SUBTITLE, getCurrentDomain());
         setupDialogFallbacks();
 
         try {
