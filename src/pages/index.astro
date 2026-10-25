@@ -42,16 +42,41 @@ const hackerImageUrl = (rawHackerImageUrl !== undefined ? rawHackerImageUrl : ''
     <meta name="robots" content="noindex, nofollow" />
     <title>404 — Página não encontrada</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script is:inline>
+      (function () {
+        var THEMES = [
+          { accent: '#10b981', glow: 'rgba(16, 185, 129, 0.42)', soft: 'rgba(16, 185, 129, 0.14)' },
+          { accent: '#06b6d4', glow: 'rgba(6, 182, 212, 0.42)', soft: 'rgba(6, 182, 212, 0.14)' },
+          { accent: '#8b5cf6', glow: 'rgba(139, 92, 246, 0.45)', soft: 'rgba(139, 92, 246, 0.15)' },
+          { accent: '#f43f5e', glow: 'rgba(244, 63, 94, 0.42)', soft: 'rgba(244, 63, 94, 0.14)' },
+          { accent: '#f59e0b', glow: 'rgba(245, 158, 11, 0.40)', soft: 'rgba(245, 158, 11, 0.14)' },
+          { accent: '#3b82f6', glow: 'rgba(59, 130, 246, 0.45)', soft: 'rgba(59, 130, 246, 0.15)' },
+          { accent: '#d946ef', glow: 'rgba(217, 70, 239, 0.42)', soft: 'rgba(217, 70, 239, 0.14)' },
+        ];
+        var prevIdx = Number(sessionStorage.getItem('glowIdx') ?? -1);
+        var nextIdx = Math.floor(Math.random() * THEMES.length);
+        if (nextIdx === prevIdx) {
+          nextIdx = (nextIdx + 1) % THEMES.length;
+        }
+        sessionStorage.setItem('glowIdx', String(nextIdx));
+        var theme = THEMES[nextIdx];
+        var root = document.documentElement;
+        root.style.setProperty('--accent', theme.accent);
+        root.style.setProperty('--accent-glow', theme.glow);
+        root.style.setProperty('--accent-soft', theme.soft);
+        window.__CURRENT_ACCENT__ = theme.accent;
+      })();
+    </script>
   </head>
 
   <body class="min-h-dvh flex flex-col items-center justify-center relative px-4 py-12">
     <div
       id="bg-glow"
       aria-hidden="true"
-      class="pointer-events-none fixed top-1/2 left-1/2 w-[26rem] h-[26rem] opacity-75 transition-opacity duration-700"
+      class="pointer-events-none fixed top-1/2 left-1/2 w-[26rem] h-[26rem]"
     ></div>
 
-    <main class="relative z-10 w-full max-w-xl text-center animate-content-expand">
+    <main class="relative z-10 w-full max-w-xl text-center animate-content-fade-in">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900/90 border border-zinc-800 text-xs font-mono text-zinc-400 mb-6 shadow-sm">
         <span class="w-2 h-2 rounded-full accent-dot animate-pulse"></span>
         <span>HTTP 404 // ROUTE_NOT_FOUND</span>
@@ -68,7 +93,15 @@ const hackerImageUrl = (rawHackerImageUrl !== undefined ? rawHackerImageUrl : ''
       <div class="mt-4 flex flex-col items-center">
         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-zinc-900/90 border border-zinc-800 font-mono text-xs sm:text-sm max-w-full shadow-sm">
           <span class="text-zinc-500 select-none font-semibold">GET</span>
-          <code id="domain-badge" class="accent-text font-medium break-all">...</code>
+          <code id="domain-badge" class="accent-text font-medium break-all"></code>
+          <script is:inline>
+            (function () {
+              var host = window.location.host || 'desconhecido';
+              var path = window.location.pathname && window.location.pathname !== '/' ? window.location.pathname : '';
+              var el = document.getElementById('domain-badge');
+              if (el) el.textContent = host + path;
+            })();
+          </script>
         </div>
 
         <div id="typo-wrapper" hidden class="mt-2.5">
@@ -121,7 +154,7 @@ const hackerImageUrl = (rawHackerImageUrl !== undefined ? rawHackerImageUrl : ''
               rel="noopener noreferrer"
               class:list={[
                 'animate-fade-in-up inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800/90 text-zinc-200 border border-zinc-800 hover:border-zinc-700 font-medium text-sm transition-all duration-200 hover:-translate-y-0.5',
-                hasPortfolio && '[animation-delay:220ms]'
+                hasPortfolio && '[animation-delay:260ms]'
               ]}
             >
               <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -213,45 +246,6 @@ const hackerImageUrl = (rawHackerImageUrl !== undefined ? rawHackerImageUrl : ''
     </dialog>
 
     <script>
-      const THEMES = [
-        { accent: '#10b981', glow: 'rgba(16, 185, 129, 0.42)', soft: 'rgba(16, 185, 129, 0.14)' }, // Emerald
-        { accent: '#06b6d4', glow: 'rgba(6, 182, 212, 0.42)',  soft: 'rgba(6, 182, 212, 0.14)' },  // Cyan
-        { accent: '#8b5cf6', glow: 'rgba(139, 92, 246, 0.45)', soft: 'rgba(139, 92, 246, 0.15)' }, // Violet
-        { accent: '#f43f5e', glow: 'rgba(244, 63, 94, 0.42)',  soft: 'rgba(244, 63, 94, 0.14)' },  // Rose
-        { accent: '#f59e0b', glow: 'rgba(245, 158, 11, 0.40)', soft: 'rgba(245, 158, 11, 0.14)' }, // Amber
-        { accent: '#3b82f6', glow: 'rgba(59, 130, 246, 0.45)', soft: 'rgba(59, 130, 246, 0.15)' }, // Blue
-        { accent: '#d946ef', glow: 'rgba(217, 70, 239, 0.42)', soft: 'rgba(217, 70, 239, 0.14)' }, // Fuchsia
-      ];
-
-      function randomizeTheme(): string {
-        const prevIdx = Number(sessionStorage.getItem('glowIdx') ?? -1);
-        let nextIdx = Math.floor(Math.random() * THEMES.length);
-        if (nextIdx === prevIdx) {
-          nextIdx = (nextIdx + 1) % THEMES.length;
-        }
-
-        sessionStorage.setItem('glowIdx', String(nextIdx));
-        const theme = THEMES[nextIdx];
-        const root = document.documentElement;
-        root.style.setProperty('--accent', theme.accent);
-        root.style.setProperty('--accent-glow', theme.glow);
-        root.style.setProperty('--accent-soft', theme.soft);
-        return theme.accent;
-      }
-
-      function getCurrentDomain(): string {
-        const host = window.location.host || 'desconhecido';
-        const path = window.location.pathname && window.location.pathname !== '/' ? window.location.pathname : '';
-        return `${host}${path}`;
-      }
-
-      function updateDomainBadge(): void {
-        const badgeEl = document.getElementById('domain-badge');
-        if (badgeEl) {
-          badgeEl.textContent = getCurrentDomain();
-        }
-      }
-
       function levenshtein(a: string, b: string): number {
         const dp = Array.from({ length: a.length + 1 }, (_, i) =>
           Array.from({ length: b.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
@@ -383,9 +377,8 @@ const hackerImageUrl = (rawHackerImageUrl !== undefined ? rawHackerImageUrl : ''
       }
 
       function init(): void {
-        const accent = randomizeTheme();
+        const accent = (window as unknown as { __CURRENT_ACCENT__?: string }).__CURRENT_ACCENT__ || '#10b981';
         setupHackerConsole(accent);
-        updateDomainBadge();
         setupDialogFallbacks();
 
         const portfolioBtn = document.getElementById('portfolio-btn') as HTMLAnchorElement | null;

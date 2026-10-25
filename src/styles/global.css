@@ -49,7 +49,9 @@
   );
   border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%;
   filter: blur(78px);
-  animation: glow-spinner 7s linear infinite;
+  animation:
+    glow-bloom 1.2s cubic-bezier(0.16, 1, 0.3, 1) both,
+    glow-spinner 8s linear infinite;
 }
 
 dialog#hacker-dialog {
@@ -96,19 +98,28 @@ dialog#hacker-dialog[open] {
   }
 }
 
-@keyframes content-expand {
+@keyframes glow-bloom {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(6px);
   }
   to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
+    opacity: 0.75;
   }
 }
 
-.animate-content-expand {
-  animation: content-expand 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes content-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-content-fade-in {
+  animation: content-fade-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes fade-in-up {
@@ -123,14 +134,20 @@ dialog#hacker-dialog[open] {
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: 0.15s;
+  animation: fade-in-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.18s;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-in-up {
+  .animate-content-fade-in,
+  .animate-fade-in-up,
+  #bg-glow {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+  #bg-glow {
+    opacity: 0.75;
+    transform: translate(-50%, -50%);
   }
 }
