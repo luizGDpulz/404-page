@@ -20,18 +20,15 @@ import '../styles/global.css';
     ></div>
 
     <main class="relative z-10 w-full max-w-xl text-center">
-      <!-- Pill de status -->
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900/90 border border-zinc-800 text-xs font-mono text-zinc-400 mb-6 shadow-sm">
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
         <span>HTTP 404 // ROUTE_NOT_FOUND</span>
       </div>
 
-      <!-- Número 404 em destaque -->
       <h1 class="text-8xl sm:text-9xl font-black tracking-tighter bg-gradient-to-b from-white via-zinc-200 to-zinc-600 bg-clip-text text-transparent select-none leading-none">
         404
       </h1>
 
-      <!-- Mensagem dinâmica com {domain} -->
       <p
         id="error-message"
         class="mt-6 text-base sm:text-lg text-zinc-400 leading-relaxed max-w-md mx-auto"
@@ -41,15 +38,12 @@ import '../styles/global.css';
         não existe ou eu quebrei alguma coisa!
       </p>
 
-      <!-- Seção modular de botões (Portfólio / GitHub) -->
-      <!-- Oculta por padrão (hidden); exibida apenas se pelo menos 1 link estiver configurado -->
       <nav
         id="links-section"
         aria-label="Links úteis"
         hidden
         class="mt-9 flex flex-wrap items-center justify-center gap-3.5"
       >
-        <!-- Botão do Portfólio (renderizado apenas se portfolioUrl existir) -->
         <a
           id="portfolio-btn"
           href="#"
@@ -65,7 +59,6 @@ import '../styles/global.css';
           <span id="portfolio-label">Meu Portfólio</span>
         </a>
 
-        <!-- Botão do GitHub (renderizado apenas se githubUrl existir) -->
         <a
           id="github-btn"
           href="#"
@@ -81,7 +74,7 @@ import '../styles/global.css';
         </a>
       </nav>
 
-      <!-- Segredo no DOM para quem inspecionar o HTML (basta remover o atributo `hidden` no DevTools) -->
+      <!-- Easter egg: remova `hidden` no DevTools -->
       <div
         id="hacker-secret"
         data-easter-egg="Opa, xeretando o HTML? Remova o atributo 'hidden' deste elemento..."
@@ -101,10 +94,8 @@ import '../styles/global.css';
       </div>
     </main>
 
-    <!-- Modal / Popover estilo mini-terminal para o Easter Egg -->
     <dialog id="hacker-dialog" closedby="any" aria-labelledby="hacker-dialog-title">
       <div class="overflow-hidden rounded-2xl bg-zinc-950 text-left">
-        <!-- Barra de título estilo terminal -->
         <div class="flex items-center justify-between px-4 py-3 bg-zinc-900/90 border-b border-zinc-800">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
@@ -128,7 +119,6 @@ import '../styles/global.css';
           </button>
         </div>
 
-        <!-- Corpo do Modal -->
         <div class="p-6 space-y-4 font-mono text-sm">
           <div class="flex items-start gap-3">
             <span id="hacker-emoji" class="text-2xl select-none shrink-0" aria-hidden="true">🕵️‍♂️</span>
@@ -137,7 +127,6 @@ import '../styles/global.css';
             </p>
           </div>
 
-          <!-- Imagem ou GIF opcional caso configurado -->
           <div id="hacker-image-wrapper" hidden class="pt-2">
             <img
               id="hacker-image"
@@ -204,7 +193,6 @@ import '../styles/global.css';
         const domain = getCurrentDomain();
         renderMessage(config.messageTemplate || DEFAULT_TEMPLATE, domain);
 
-        // Modularidade dos links: Portfólio e GitHub
         const linksSection = document.getElementById('links-section');
         const portfolioBtn = document.getElementById('portfolio-btn') as HTMLAnchorElement | null;
         const portfolioLabel = document.getElementById('portfolio-label');
@@ -242,7 +230,6 @@ import '../styles/global.css';
           linksSection.hidden = !hasAnyLink;
         }
 
-        // Easter egg customizável (mantém o container #hacker-secret com atributo `hidden` no DOM para quem inspecionar!)
         const triggerTextEl = document.getElementById('hacker-trigger-text');
         const emojiEl = document.getElementById('hacker-emoji');
         const messageEl = document.getElementById('hacker-message');
@@ -273,7 +260,7 @@ import '../styles/global.css';
         const dialog = document.getElementById('hacker-dialog') as HTMLDialogElement | null;
         if (!dialog) return;
 
-        // Fallback para Invoker Commands (commandfor / command) em navegadores sem suporte nativo
+        // Fallback: Invoker Commands
         if (!('commandForElement' in HTMLButtonElement.prototype)) {
           document.addEventListener('click', (event) => {
             const btn = (event.target as Element | null)?.closest?.('button[commandfor]') as HTMLButtonElement | null;
@@ -290,7 +277,7 @@ import '../styles/global.css';
           });
         }
 
-        // Fallback para light-dismiss (<dialog closedby="any">) em navegadores sem suporte nativo
+        // Fallback: light-dismiss
         if (!('closedBy' in HTMLDialogElement.prototype)) {
           dialog.addEventListener('click', (event) => {
             if (event.target !== dialog) return;
@@ -307,11 +294,9 @@ import '../styles/global.css';
       }
 
       async function init(): Promise<void> {
-        // Renderiza imediatamente o domínio atual
         renderMessage(DEFAULT_TEMPLATE, getCurrentDomain());
         setupDialogFallbacks();
 
-        // Carrega configuração em runtime (/config.json gerado pelo entrypoint do container ou arquivo estático)
         try {
           const res = await fetch('/config.json', { cache: 'no-store' });
           if (res.ok) {
@@ -320,7 +305,7 @@ import '../styles/global.css';
             return;
           }
         } catch {
-          // Fallback silencioso caso /config.json não esteja acessível
+          // Usa defaults locais
         }
 
         applyConfig({});

@@ -17,7 +17,6 @@
   }
 }
 
-/* Estilização moderna do modal <dialog> e ::backdrop */
 dialog#hacker-dialog {
   margin: auto;
   padding: 0;
