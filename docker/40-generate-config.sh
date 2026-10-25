@@ -13,14 +13,19 @@ escape_json() {
     printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e ':a;N;$!ba;s/\n/\\n/g'
 }
 
+DEFAULT_MSG='Parece que você se perdeu, o endereço que você buscou {domain} não existe ou eu quebrei alguma coisa!'
+DEFAULT_HACKER_TRIGGER='Estava tentando me hackear?'
+DEFAULT_HACKER_EMOJI='🕵️‍♂️'
+DEFAULT_HACKER_MSG="Boa tentativa! Tirar o atributo 'hidden' no DevTools não conta como zero-day, mas ganhou pontos pela curiosidade."
+
 PORTFOLIO_URL_ESC=$(escape_json "${PORTFOLIO_URL:-}")
 PORTFOLIO_LABEL_ESC=$(escape_json "${PORTFOLIO_LABEL:-Meu Portfólio}")
 GITHUB_URL_ESC=$(escape_json "${GITHUB_URL:-}")
 GITHUB_LABEL_ESC=$(escape_json "${GITHUB_LABEL:-GitHub Pessoal}")
-MESSAGE_TEMPLATE_ESC=$(escape_json "${MESSAGE_TEMPLATE:-Parece que você se perdeu, o endereço que você buscou {domain} não existe ou eu quebrei alguma coisa!}")
-HACKER_TRIGGER_TEXT_ESC=$(escape_json "${HACKER_TRIGGER_TEXT:-Estava tentando me hackear?}")
-HACKER_EMOJI_ESC=$(escape_json "${HACKER_EMOJI:-🕵️‍♂️}")
-HACKER_MESSAGE_ESC=$(escape_json "${HACKER_MESSAGE:-Boa tentativa! Tirar o atributo 'hidden' no DevTools não conta como zero-day, mas ganhou pontos pela curiosidade.}")
+MESSAGE_TEMPLATE_ESC=$(escape_json "${MESSAGE_TEMPLATE:-$DEFAULT_MSG}")
+HACKER_TRIGGER_TEXT_ESC=$(escape_json "${HACKER_TRIGGER_TEXT:-$DEFAULT_HACKER_TRIGGER}")
+HACKER_EMOJI_ESC=$(escape_json "${HACKER_EMOJI:-$DEFAULT_HACKER_EMOJI}")
+HACKER_MESSAGE_ESC=$(escape_json "${HACKER_MESSAGE:-$DEFAULT_HACKER_MSG}")
 HACKER_IMAGE_URL_ESC=$(escape_json "${HACKER_IMAGE_URL:-}")
 
 cat <<EOF > "$CONFIG_PATH"

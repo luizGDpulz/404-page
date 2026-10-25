@@ -1,23 +1,12 @@
 services:
   404-page:
     image: ghcr.io/luizgdpulz/404-page:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
     container_name: 404-page
     restart: unless-stopped
     expose:
       - "80"
-    environment:
-      PORTFOLIO_URL: ${PORTFOLIO_URL:-https://portfolio.pulz.dev.br}
-      PORTFOLIO_LABEL: ${PORTFOLIO_LABEL:-Meu Portfólio}
-      GITHUB_URL: ${GITHUB_URL:-https://github.com/luizGDpulz}
-      GITHUB_LABEL: ${GITHUB_LABEL:-GitHub Pessoal}
-      MESSAGE_TEMPLATE: ${MESSAGE_TEMPLATE:-Parece que você se perdeu, o endereço que você buscou {domain} não existe ou eu quebrei alguma coisa!}
-      HACKER_TRIGGER_TEXT: ${HACKER_TRIGGER_TEXT:-Estava tentando me hackear?}
-      HACKER_EMOJI: ${HACKER_EMOJI:-🕵️‍♂️}
-      HACKER_MESSAGE: ${HACKER_MESSAGE:-Boa tentativa! Tirar o atributo 'hidden' no DevTools não conta como zero-day, mas ganhou pontos pela curiosidade.}
-      HACKER_IMAGE_URL: ${HACKER_IMAGE_URL:-}
+    env_file:
+      - .env
     networks:
       - proxy-net
 
