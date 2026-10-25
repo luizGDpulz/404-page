@@ -402,8 +402,37 @@ import '../styles/global.css';
         }
       }
 
+      function setupHackerConsole(accent: string): void {
+        console.log(
+          '%c 🚨 OPA, XERETA DETECTADO! ',
+          `background: ${accent}; color: #09090b; font-weight: 800; font-family: monospace; font-size: 14px; padding: 4px 8px; border-radius: 6px;`
+        );
+        console.log(
+          '%cAbriu o F12 achando que ia achar um .env dando sopa ou a senha do banco em texto puro, né safado(a)? 😂\nJá que a coceira na mão tá grande, vai lá na aba Elements e tira o atributo %chidden%c do elemento secreto no HTML, seu curioso!',
+          'color: #d4d4d8; font-family: monospace; font-size: 12px; line-height: 1.6;',
+          `color: ${accent}; font-weight: bold; font-family: monospace; font-size: 12px;`,
+          'color: #d4d4d8; font-family: monospace; font-size: 12px; line-height: 1.6;'
+        );
+
+        const secretEl = document.getElementById('hacker-secret');
+        if (!secretEl) return;
+
+        const observer = new MutationObserver(() => {
+          if (!secretEl.hasAttribute('hidden')) {
+            console.log(
+              '%c👀 Olha só, sabe mesmo mexer no DOM! O botão secreto apareceu lá no rodapé da página. Clica nele se tiver coragem...',
+              `color: ${accent}; font-family: monospace; font-weight: bold; font-size: 12px;`
+            );
+            observer.disconnect();
+          }
+        });
+
+        observer.observe(secretEl, { attributes: true, attributeFilter: ['hidden'] });
+      }
+
       async function init(): Promise<void> {
-        randomizeTheme();
+        const accent = randomizeTheme();
+        setupHackerConsole(accent);
         renderMessage(DEFAULT_SUBTITLE, getCurrentDomain());
         setupDialogFallbacks();
 
