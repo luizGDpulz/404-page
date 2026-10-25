@@ -1,5 +1,37 @@
 ---
 import '../styles/global.css';
+
+const DEFAULT_PORTFOLIO_URL = 'https://portfolio.pulz.dev.br';
+const DEFAULT_PORTFOLIO_LABEL = 'Meu Portfólio';
+const DEFAULT_GITHUB_URL = 'https://github.com/luizGDpulz';
+const DEFAULT_GITHUB_LABEL = 'GitHub Pessoal';
+
+const rawPortfolioUrl = import.meta.env.PORTFOLIO_URL ?? process.env.PORTFOLIO_URL;
+const rawPortfolioLabel = import.meta.env.PORTFOLIO_LABEL ?? process.env.PORTFOLIO_LABEL;
+const rawGithubUrl = import.meta.env.GITHUB_URL ?? process.env.GITHUB_URL;
+const rawGithubLabel = import.meta.env.GITHUB_LABEL ?? process.env.GITHUB_LABEL;
+
+const portfolioUrl = (rawPortfolioUrl !== undefined ? rawPortfolioUrl : DEFAULT_PORTFOLIO_URL).trim();
+const portfolioLabel = (rawPortfolioLabel !== undefined ? rawPortfolioLabel : DEFAULT_PORTFOLIO_LABEL).trim() || DEFAULT_PORTFOLIO_LABEL;
+
+const githubUrl = (rawGithubUrl !== undefined ? rawGithubUrl : DEFAULT_GITHUB_URL).trim();
+const githubLabel = (rawGithubLabel !== undefined ? rawGithubLabel : DEFAULT_GITHUB_LABEL).trim() || DEFAULT_GITHUB_LABEL;
+
+const hasPortfolio = Boolean(portfolioUrl);
+const hasGithub = Boolean(githubUrl);
+const hasAnyLink = hasPortfolio || hasGithub;
+
+const rawHackerTriggerText = import.meta.env.HACKER_TRIGGER_TEXT ?? process.env.HACKER_TRIGGER_TEXT;
+const hackerTriggerText = (rawHackerTriggerText !== undefined ? rawHackerTriggerText : 'Estava tentando me hackear?').trim() || 'Estava tentando me hackear?';
+
+const rawHackerEmoji = import.meta.env.HACKER_EMOJI ?? process.env.HACKER_EMOJI;
+const hackerEmoji = (rawHackerEmoji !== undefined ? rawHackerEmoji : '🕵️‍♂️').trim() || '🕵️‍♂️';
+
+const rawHackerMessage = import.meta.env.HACKER_MESSAGE ?? process.env.HACKER_MESSAGE;
+const hackerMessage = (rawHackerMessage !== undefined ? rawHackerMessage : "Boa tentativa! Tirar o atributo 'hidden' no DevTools não conta como zero-day, mas ganhou pontos pela curiosidade.").trim() || "Boa tentativa! Tirar o atributo 'hidden' no DevTools não conta como zero-day, mas ganhou pontos pela curiosidade.";
+
+const rawHackerImageUrl = import.meta.env.HACKER_IMAGE_URL ?? process.env.HACKER_IMAGE_URL;
+const hackerImageUrl = (rawHackerImageUrl !== undefined ? rawHackerImageUrl : '').trim();
 ---
 
 <!doctype html>
@@ -59,41 +91,47 @@ import '../styles/global.css';
         O endereço que você buscou não existe ou eu quebrei alguma coisa!
       </p>
 
-      <nav
-        id="links-section"
-        aria-label="Links úteis"
-        hidden
-        class="mt-9 flex flex-wrap items-center justify-center gap-3.5"
-      >
-        <a
-          id="portfolio-btn"
-          href="#"
-          hidden
-          rel="noopener noreferrer"
-          class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-zinc-100 hover:bg-white text-zinc-950 font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-emerald-500/10 hover:-translate-y-0.5"
+      {hasAnyLink && (
+        <nav
+          id="links-section"
+          aria-label="Links úteis"
+          class="mt-9 flex flex-wrap items-center justify-center gap-3.5"
         >
-          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
-            <path d="M2 12h20"></path>
-          </svg>
-          <span id="portfolio-label">Meu Portfólio</span>
-        </a>
+          {hasPortfolio && (
+            <a
+              id="portfolio-btn"
+              href={portfolioUrl}
+              rel="noopener noreferrer"
+              class="animate-fade-in-up inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-zinc-100 hover:bg-white text-zinc-950 font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-emerald-500/10 hover:-translate-y-0.5"
+            >
+              <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                <path d="M2 12h20"></path>
+              </svg>
+              <span id="portfolio-label">{portfolioLabel}</span>
+            </a>
+          )}
 
-        <a
-          id="github-btn"
-          href="#"
-          hidden
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800/90 text-zinc-200 border border-zinc-800 hover:border-zinc-700 font-medium text-sm transition-all duration-200 hover:-translate-y-0.5"
-        >
-          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-          </svg>
-          <span id="github-label">GitHub Pessoal</span>
-        </a>
-      </nav>
+          {hasGithub && (
+            <a
+              id="github-btn"
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class:list={[
+                'animate-fade-in-up inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800/90 text-zinc-200 border border-zinc-800 hover:border-zinc-700 font-medium text-sm transition-all duration-200 hover:-translate-y-0.5',
+                hasPortfolio && '[animation-delay:220ms]'
+              ]}
+            >
+              <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+              </svg>
+              <span id="github-label">{githubLabel}</span>
+            </a>
+          )}
+        </nav>
+      )}
 
       <!-- Easter egg: remova `hidden` no DevTools -->
       <div
@@ -110,7 +148,7 @@ import '../styles/global.css';
           class="group inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono text-zinc-500 hover:text-zinc-200 hover:bg-zinc-900/60 transition-colors cursor-pointer"
         >
           <span class="accent-text group-hover:translate-x-0.5 transition-transform">&gt;_</span>
-          <span id="hacker-trigger-text">Estava tentando me hackear?</span>
+          <span id="hacker-trigger-text">{hackerTriggerText}</span>
         </button>
       </div>
     </main>
@@ -142,21 +180,23 @@ import '../styles/global.css';
 
         <div class="p-6 space-y-4 font-mono text-sm">
           <div class="flex items-start gap-3">
-            <span id="hacker-emoji" class="text-2xl select-none shrink-0" aria-hidden="true">🕵️‍♂️</span>
+            <span id="hacker-emoji" class="text-2xl select-none shrink-0" aria-hidden="true">{hackerEmoji}</span>
             <p id="hacker-message" class="text-zinc-300 leading-relaxed">
-              Boa tentativa! Tirar o atributo 'hidden' no DevTools não conta como zero-day, mas ganhou pontos pela curiosidade.
+              {hackerMessage}
             </p>
           </div>
 
-          <div id="hacker-image-wrapper" hidden class="pt-2">
-            <img
-              id="hacker-image"
-              src=""
-              alt="Easter egg"
-              loading="lazy"
-              class="w-full max-h-60 object-cover rounded-lg border border-zinc-800"
-            />
-          </div>
+          {hackerImageUrl && (
+            <div id="hacker-image-wrapper" class="pt-2">
+              <img
+                id="hacker-image"
+                src={hackerImageUrl}
+                alt="Easter egg"
+                loading="lazy"
+                class="w-full max-h-60 object-cover rounded-lg border border-zinc-800"
+              />
+            </div>
+          )}
 
           <div class="pt-2 flex justify-end">
             <button
@@ -173,14 +213,6 @@ import '../styles/global.css';
     </dialog>
 
     <script>
-      import type { AppConfig } from '../types/config';
-
-      const DEFAULT_SUBTITLE =
-        'O endereço que você buscou não existe ou eu quebrei alguma coisa!';
-
-      const LEGACY_DEFAULT_TEMPLATE =
-        'Parece que você se perdeu, o endereço que você buscou {domain} não existe ou eu quebrei alguma coisa!';
-
       const THEMES = [
         { accent: '#10b981', glow: 'rgba(16, 185, 129, 0.42)', soft: 'rgba(16, 185, 129, 0.14)' }, // Emerald
         { accent: '#06b6d4', glow: 'rgba(6, 182, 212, 0.42)',  soft: 'rgba(6, 182, 212, 0.14)' },  // Cyan
@@ -213,22 +245,11 @@ import '../styles/global.css';
         return `${host}${path}`;
       }
 
-      function renderMessage(template: string, domain: string): void {
+      function updateDomainBadge(): void {
         const badgeEl = document.getElementById('domain-badge');
         if (badgeEl) {
-          badgeEl.textContent = domain;
+          badgeEl.textContent = getCurrentDomain();
         }
-
-        const msgEl = document.getElementById('error-message');
-        if (!msgEl) return;
-
-        const trimmed = template.trim();
-        if (!trimmed || trimmed === LEGACY_DEFAULT_TEMPLATE) {
-          msgEl.textContent = DEFAULT_SUBTITLE;
-          return;
-        }
-
-        msgEl.textContent = trimmed.replace('{domain}', domain);
       }
 
       function levenshtein(a: string, b: string): number {
@@ -265,7 +286,7 @@ import '../styles/global.css';
 
         if (portfolioUrl) {
           try {
-            const parsed = new URL(portfolioUrl);
+            const parsed = new URL(portfolioUrl, window.location.origin);
             const kw = parsed.hostname.split('.')[0].toLowerCase();
             candidates.push({ keyword: kw, label: parsed.hostname, url: portfolioUrl });
           } catch {
@@ -294,75 +315,6 @@ import '../styles/global.css';
         }
 
         wrapper.hidden = true;
-      }
-
-      function applyConfig(config: AppConfig): void {
-        const domain = getCurrentDomain();
-        renderMessage(config.messageTemplate || DEFAULT_SUBTITLE, domain);
-
-        const linksSection = document.getElementById('links-section');
-        const portfolioBtn = document.getElementById('portfolio-btn') as HTMLAnchorElement | null;
-        const portfolioLabel = document.getElementById('portfolio-label');
-        const githubBtn = document.getElementById('github-btn') as HTMLAnchorElement | null;
-        const githubLabel = document.getElementById('github-label');
-
-        const portfolioUrl = config.portfolioUrl?.trim() || '';
-        const githubUrl = config.githubUrl?.trim() || '';
-
-        checkTypoSuggestion(portfolioUrl, githubUrl);
-
-        let hasAnyLink = false;
-
-        if (portfolioBtn && portfolioUrl) {
-          portfolioBtn.href = portfolioUrl;
-          if (portfolioLabel && config.portfolioLabel?.trim()) {
-            portfolioLabel.textContent = config.portfolioLabel.trim();
-          }
-          portfolioBtn.hidden = false;
-          hasAnyLink = true;
-        } else if (portfolioBtn) {
-          portfolioBtn.hidden = true;
-        }
-
-        if (githubBtn && githubUrl) {
-          githubBtn.href = githubUrl;
-          if (githubLabel && config.githubLabel?.trim()) {
-            githubLabel.textContent = config.githubLabel.trim();
-          }
-          githubBtn.hidden = false;
-          hasAnyLink = true;
-        } else if (githubBtn) {
-          githubBtn.hidden = true;
-        }
-
-        if (linksSection) {
-          linksSection.hidden = !hasAnyLink;
-        }
-
-        const triggerTextEl = document.getElementById('hacker-trigger-text');
-        const emojiEl = document.getElementById('hacker-emoji');
-        const messageEl = document.getElementById('hacker-message');
-        const imageWrapper = document.getElementById('hacker-image-wrapper');
-        const imageEl = document.getElementById('hacker-image') as HTMLImageElement | null;
-
-        if (triggerTextEl && config.hackerTriggerText?.trim()) {
-          triggerTextEl.textContent = config.hackerTriggerText.trim();
-        }
-        if (emojiEl && config.hackerEmoji?.trim()) {
-          emojiEl.textContent = config.hackerEmoji.trim();
-        }
-        if (messageEl && config.hackerMessage?.trim()) {
-          messageEl.textContent = config.hackerMessage.trim();
-        }
-        if (imageWrapper && imageEl) {
-          const imgUrl = config.hackerImageUrl?.trim() || '';
-          if (imgUrl) {
-            imageEl.src = imgUrl;
-            imageWrapper.hidden = false;
-          } else {
-            imageWrapper.hidden = true;
-          }
-        }
       }
 
       function setupDialogFallbacks(): void {
@@ -430,24 +382,18 @@ import '../styles/global.css';
         observer.observe(secretEl, { attributes: true, attributeFilter: ['hidden'] });
       }
 
-      async function init(): Promise<void> {
+      function init(): void {
         const accent = randomizeTheme();
         setupHackerConsole(accent);
-        renderMessage(DEFAULT_SUBTITLE, getCurrentDomain());
+        updateDomainBadge();
         setupDialogFallbacks();
 
-        try {
-          const res = await fetch('/config.json', { cache: 'no-store' });
-          if (res.ok) {
-            const jsonConfig = (await res.json()) as AppConfig;
-            applyConfig(jsonConfig);
-            return;
-          }
-        } catch {
-          // Usa defaults locais
-        }
+        const portfolioBtn = document.getElementById('portfolio-btn') as HTMLAnchorElement | null;
+        const githubBtn = document.getElementById('github-btn') as HTMLAnchorElement | null;
+        const portfolioUrl = portfolioBtn?.getAttribute('href') || '';
+        const githubUrl = githubBtn?.getAttribute('href') || '';
 
-        applyConfig({});
+        checkTypoSuggestion(portfolioUrl, githubUrl);
       }
 
       init();

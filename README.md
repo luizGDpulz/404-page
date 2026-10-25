@@ -8,31 +8,44 @@ Projetada para atuar como *catch-all fallback* elegante em infraestruturas com D
 
 ## ✨ Funcionalidades
 
-- **Retorno HTTP 404 Semântico Real:** O Nginx entrega a SPA mantendo o status HTTP `404 Not Found` para rotas inexistentes, enquanto serve os assets estáticos (`/_astro/*`, `/config.json`) com `200 OK`.
-- **Domínio Dinâmico (`{domain}`):** Identifica automaticamente o subdomínio/rota que o usuário tentou acessar e injeta na mensagem configurável.
+- **Retorno HTTP 404 Semântico Real:** O Nginx entrega a SPA mantendo o status HTTP `404 Not Found` para rotas inexistentes, enquanto serve os assets estáticos (`/_astro/*`) com `200 OK`.
+- **Entrega 100% Estática (Build-Time):** A presença e o destino dos botões de redirecionamento são resolvidos estaticamente no build do Astro. Zero requisições em runtime na página, sem delay e sem efeito de botões dando loading.
+- **Animações Fluidas:** Entrada suave do conteúdo e **fade in de baixo para cima** (`animate-fade-in-up`) nos botões com micro-stagger e respeito automático a `prefers-reduced-motion`.
+- **Domínio Dinâmico (`GET host/path`):** Identifica em tempo real o subdomínio/rota digitado pelo usuário e sugere links com tolerância a typos via distância Levenshtein.
 - **Modularidade Total (Zero Hardcoding):**
-  - Preencha **apenas `GITHUB_URL`** → renderiza somente o botão do GitHub.
-  - Preencha **apenas `PORTFOLIO_URL`** → renderiza somente o botão do Portfólio.
-  - Preencha **ambos** → renderiza os dois botões.
-  - **Não preencha nenhum** → a seção inteira de links permanece oculta (`hidden`).
+  - Defina **apenas `GITHUB_URL`** → renderiza somente o botão do GitHub.
+  - Defina **apenas `PORTFOLIO_URL`** → renderiza somente o botão do Portfólio.
+  - Defina **ambos** → renderiza os dois botões.
+  - **Deixe ambos vazios** → a seção inteira de links é omitida do HTML estático.
 - **Easter Egg Secreto no DOM (`hidden` + `<dialog>`):**
   - No HTML existe um bloco `<div id="hacker-secret" hidden>` invisível para visitantes comuns.
   - Se um curioso ou "hacker" abrir o DevTools (`F12`) para xeretar o HTML e remover o atributo `hidden`, o botão discreto **"Estava tentando me hackear?"** é revelado, abrindo um modal estilo mini-terminal com frase, emoji e imagem/GIF customizáveis.
-- **Configuração em Runtime:** Injeção dinâmica via variáveis de ambiente no boot do container (`/docker-entrypoint.d/40-generate-config.sh`) ou via volume `config.json` somente-leitura.
+
+---
+
+## ⚙️ Variáveis de Ambiente no Build (`.env` ou Build Args)
+
+| Variável | Descrição | Padrão |
+| :--- | :--- | :--- |
+| `PORTFOLIO_URL` | URL do portfólio (vazio omite o botão) | `"https://portfolio.pulz.dev.br"` |
+| `PORTFOLIO_LABEL` | Texto do botão do portfólio | `"Meu Portfólio"` |
+| `GITHUB_URL` | URL do GitHub (vazio omite o botão) | `"https://github.com/luizGDpulz"` |
+| `GITHUB_LABEL` | Texto do botão do GitHub | `"GitHub Pessoal"` |
+| `HACKER_TRIGGER_TEXT` | Texto do botão secreto no DOM | `"Estava tentando me hackear?"` |
+| `HACKER_EMOJI` | Emoji exibido no modal secreto | `"🕵️‍♂️"` |
+| `HACKER_MESSAGE` | Mensagem exibida no modal secreto | `"Boa tentativa! Tirar o atributo 'hidden'..."` |
+| `HACKER_IMAGE_URL` | URL opcional de imagem/GIF no modal | `""` |
 
 ---
 
 ## 🚀 Como Rodar com Docker
 
-### Opção 1: Via Variáveis de Ambiente (`docker run`)
+### Opção 1: Imagem Oficial Pré-construída
 
 ```bash
 docker run -d \
   --name 404-page \
   -p 8080:80 \
-  -e PORTFOLIO_URL="https://portfolio.pulz.dev.br" \
-  -e GITHUB_URL="https://github.com/luizGDpulz" \
-  -e HACKER_MESSAGE="Boa tentativa! Tirar o atributo 'hidden' no DevTools não conta como zero-day 🕵️‍♂️" \
   ghcr.io/luizgdpulz/404-page:latest
 ```
 
@@ -46,16 +59,6 @@ services:
     restart: unless-stopped
     expose:
       - "80"
-    environment:
-      PORTFOLIO_URL: "https://portfolio.pulz.dev.br"
-      PORTFOLIO_LABEL: "Meu Portfólio"
-      GITHUB_URL: "https://github.com/luizGDpulz"
-      GITHUB_LABEL: "GitHub Pessoal"
-      MESSAGE_TEMPLATE: "Parece que você se perdeu, o endereço que você buscou {domain} não existe ou eu quebrei alguma coisa!"
-      HACKER_TRIGGER_TEXT: "Estava tentando me hackear?"
-      HACKER_EMOJI: "🕵️‍♂️"
-      HACKER_MESSAGE: "Boa tentativa! Tirar o atributo 'hidden' no DevTools não conta como zero-day, mas ganhou pontos pela curiosidade."
-      HACKER_IMAGE_URL: ""
     networks:
       - proxy-net
 
@@ -64,33 +67,15 @@ networks:
     external: true
 ```
 
-### Opção 3: Montando um `config.json` customizado
-
-Se preferir montar um arquivo JSON diretamente (como somente-leitura `:ro`), o container respeitará o arquivo montado automaticamente:
+### Opção 3: Build Customizado com seus próprios links
 
 ```bash
-docker run -d \
-  --name 404-page \
-  -p 8080:80 \
-  -v $(pwd)/config.json:/usr/share/nginx/html/config.json:ro \
-  ghcr.io/luizgdpulz/404-page:latest
+docker build \
+  --build-arg PORTFOLIO_URL="https://seu-portfolio.com" \
+  --build-arg PORTFOLIO_LABEL="Meu Site" \
+  --build-arg GITHUB_URL="https://github.com/seu-user" \
+  -t 404-page-custom .
 ```
-
----
-
-## ⚙️ Variáveis de Ambiente Suportadas
-
-| Variável | Chave no `config.json` | Descrição | Padrão |
-| :--- | :--- | :--- | :--- |
-| `PORTFOLIO_URL` | `portfolioUrl` | URL do portfólio (vazio oculta o botão) | `""` |
-| `PORTFOLIO_LABEL` | `portfolioLabel` | Texto do botão do portfólio | `"Meu Portfólio"` |
-| `GITHUB_URL` | `githubUrl` | URL do GitHub (vazio oculta o botão) | `""` |
-| `GITHUB_LABEL` | `githubLabel` | Texto do botão do GitHub | `"GitHub Pessoal"` |
-| `MESSAGE_TEMPLATE` | `messageTemplate` | Frase principal (`{domain}` é dinâmico) | `"Parece que você se perdeu, o endereço que você buscou {domain} não existe ou eu quebrei alguma coisa!"` |
-| `HACKER_TRIGGER_TEXT` | `hackerTriggerText` | Texto do botão secreto no DOM | `"Estava tentando me hackear?"` |
-| `HACKER_EMOJI` | `hackerEmoji` | Emoji exibido no modal secreto | `"🕵️‍♂️"` |
-| `HACKER_MESSAGE` | `hackerMessage` | Mensagem exibida no modal secreto | `"Boa tentativa! ..."` |
-| `HACKER_IMAGE_URL` | `hackerImageUrl` | URL opcional de imagem/GIF no modal | `""` |
 
 ---
 
@@ -99,6 +84,9 @@ docker run -d \
 ```bash
 # Instalar dependências
 pnpm install
+
+# Copiar variáveis de ambiente de exemplo (opcional)
+cp .env.example .env
 
 # Iniciar servidor de desenvolvimento (http://localhost:4321)
 pnpm dev
