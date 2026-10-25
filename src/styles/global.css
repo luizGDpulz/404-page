@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  body {
+    background-color: #09090b;
+    color: #f4f4f5;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+/* Estilização moderna do modal <dialog> e ::backdrop */
+dialog#hacker-dialog {
+  margin: auto;
+  padding: 0;
+  border: 1px solid rgba(63, 63, 70, 0.8);
+  border-radius: 1rem;
+  background-color: #09090b;
+  color: #f4f4f5;
+  max-width: 28rem;
+  width: calc(100% - 2rem);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 40px -10px rgba(16, 185, 129, 0.15);
+}
+
+dialog#hacker-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+dialog#hacker-dialog[open] {
+  animation: dialog-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

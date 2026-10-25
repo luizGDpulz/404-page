@@ -1,0 +1,11 @@
+{
+  "portfolioUrl": "https://portfolio.pulz.dev.br",
+  "portfolioLabel": "Meu Portfólio",
+  "githubUrl": "https://github.com/luizGDpulz",
+  "githubLabel": "GitHub Pessoal",
+  "messageTemplate": "Parece que você se perdeu, o endereço que você buscou {domain} não existe ou eu quebrei alguma coisa!",
+  "hackerTriggerText": "Estava tentando me hackear?",
+  "hackerEmoji": "🕵️‍♂️",
+  "hackerMessage": "Boa tentativa! Tirar o atributo 'hidden' no DevTools não conta como zero-day, mas ganhou pontos pela curiosidade.",
+  "hackerImageUrl": ""
+}
