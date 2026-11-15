@@ -9,6 +9,13 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.
 
 ---
 
+## [1.1.1] - 2026-11-15
+
+### 🐛 Corrigido
+- Adicionado `proxy_intercept_errors off;` em `docker/npm/fallback_proxy.conf` e `docs/npm-setup.md` para impedir que o NPM re-interceptasse os códigos `502`/`503`/`504` retornados pelo próprio container `404-page:8080` (#6).
+
+---
+
 ## [1.1.0] - 2026-11-15
 
 ### 🚀 Adicionado
@@ -25,5 +32,6 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.
 - `README.md` reescrito deixando explícita a integração com Nginx Proxy Manager e a independência da camada de borda (#4).
 - `.env.example` limpo removendo variável obsoleta (`MESSAGE_TEMPLATE`) (#3).
 
-[Não lançado]: https://github.com/luizGDpulz/404-page/compare/v1.1.0...HEAD
+[Não lançado]: https://github.com/luizGDpulz/404-page/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/luizGDpulz/404-page/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/luizGDpulz/404-page/releases/tag/v1.1.0
