@@ -164,6 +164,7 @@ Todo `proxy_host/*.conf` gerado pelo NPM inclui automaticamente o arquivo `/data
 2. Crie o arquivo `fallback_proxy.conf` dentro dessa pasta (veja o template em [`docker/npm/fallback_proxy.conf`](../docker/npm/fallback_proxy.conf)):
    ```nginx
    # Encaminha internamente para a porta 8080 (fallback status-aware) do container 404-page
+   proxy_intercept_errors off;
    set $fallback_upstream "http://404-page:8080";
    proxy_pass $fallback_upstream$request_uri;
    proxy_set_header Host $host;
