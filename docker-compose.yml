@@ -3,10 +3,11 @@ services:
     image: ghcr.io/luizgdpulz/404-page:latest
     container_name: 404-page
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     expose:
       - "80"
-    env_file:
-      - .env
+      - "8080"
     networks:
       - proxy-net
 

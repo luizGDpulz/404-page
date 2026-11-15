@@ -34,9 +34,13 @@ RUN pnpm run build
 # Stage 2: Runtime
 FROM nginx:alpine AS runtime
 
-RUN rm -f /etc/nginx/conf.d/default.conf
+RUN rm -f /etc/nginx/conf.d/default.conf && mkdir -p /etc/nginx/includes
+COPY docker/static-assets.conf /etc/nginx/includes/static-assets.conf
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 80 8080
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget -q -O /dev/null http://127.0.0.1:80/favicon.svg || exit 1
